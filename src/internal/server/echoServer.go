@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"message/src/internal/handler"
+	"messager/src/internal/handler"
 )
 
 type EchoServer struct {
@@ -26,7 +26,8 @@ func (s *EchoServer) Run(address string) error {
 
 func (s *EchoServer) InitRoutes(handler *handler.Handler) {
 	s.handler = handler
-	s.POST("/auth/sign-in", s.handler.SingIn)
+	//TODO
+	s.POST("/auth/sign-in", s.handler.SignIn)
 }
 
 func (s *EchoServer) Stop() error {

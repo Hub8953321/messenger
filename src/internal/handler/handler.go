@@ -1,13 +1,18 @@
 package handler
 
-import "message/src/pkg/logger"
+import (
+	"messager/src/internal/service"
+	"messager/src/pkg/logger"
+)
 
 type Handler struct {
-	logger logger.Logger
+	logger.Logger
+	*service.Service
 }
 
-func NewHandler(logger logger.Logger) *Handler {
+func NewHandler(logger logger.Logger, service *service.Service) *Handler {
 	return &Handler{
-		logger: logger,
+		logger,
+		service,
 	}
 }
