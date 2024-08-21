@@ -1,6 +1,6 @@
 package server
 
-import "message/src/internal/handler"
+import "messager/src/internal/handler"
 
 type Server interface {
 	Run(string) error

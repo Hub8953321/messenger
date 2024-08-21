@@ -1,13 +1,28 @@
 package handler
 
-import "message/src/pkg/logger"
+import (
+	"github.com/Eugene-Usachev/fst"
+	"messager/src/internal/service"
+	"messager/src/pkg/logger"
+)
 
 type Handler struct {
-	logger logger.Logger
+	logger.Logger
+	*service.Service
+	AccessConverter  *fst.EncodedConverter
+	RefreshConverter *fst.EncodedConverter
 }
 
-func NewHandler(logger logger.Logger) *Handler {
+func NewHandler(
+	logger logger.Logger,
+	service *service.Service,
+	accessConverter,
+	refreshConverter *fst.EncodedConverter,
+) *Handler {
 	return &Handler{
-		logger: logger,
+		logger,
+		service,
+		accessConverter,
+		refreshConverter,
 	}
 }
