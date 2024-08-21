@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"github.com/labstack/echo/v4"
@@ -11,26 +10,25 @@ import (
 )
 
 func (h *Handler) CreateChat(ctx echo.Context) error {
-	token := ctx.QueryParam("token")
-
 	var data models.ChatCreateDTO
 
 	buf := make([]byte, 1024)
 
 	num, _ := ctx.Request().Body.Read(buf)
 	err := json.Unmarshal(buf[:num], &data)
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "cant unmarshal")
 	}
-	//TODO
-	id, err := h.Chat.CreateChat(context.Background(), token, data)
+
+	userId, _ := ctx.Get("id").(int)
+
+	id, err := h.Chat.CreateChat(ctx.Request().Context(), userId, data)
 
 	if err != nil {
 		if errors.Is(err, e.UserUnauthorized) {
 			return echo.NewHTTPError(http.StatusUnauthorized)
 		}
-		if errors.Is(err, e.ArrayTooShort) {
+		if errors.Is(err, e.ListTooShort) {
 			return echo.NewHTTPError(http.StatusBadRequest, "array of members too short")
 		}
 		if errors.Is(err, e.AccessError) {
@@ -43,21 +41,19 @@ func (h *Handler) CreateChat(ctx echo.Context) error {
 }
 
 func (h *Handler) AddMembers(ctx echo.Context) error {
-	token := ctx.QueryParam("token")
-
 	var data models.ChatAddMemberDTO
 
 	buf := make([]byte, 1024)
 
 	num, _ := ctx.Request().Body.Read(buf)
 	err := json.Unmarshal(buf[:num], &data)
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "cant unmarshal")
 	}
 
-	err = h.Chat.AddMembers(context.Background(), token, data)
+	id, _ := ctx.Get("id").(int)
 
+	err = h.Chat.AddMembers(ctx.Request().Context(), id, data)
 	if err != nil {
 		if errors.Is(err, e.UserUnauthorized) {
 			return echo.NewHTTPError(http.StatusUnauthorized)
@@ -68,22 +64,19 @@ func (h *Handler) AddMembers(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusOK)
 }
 
-func (h* Handler) RemoveMembers(ctx echo.Context) error {
-	token := ctx.QueryParam("token")
-
+func (h *Handler) RemoveMembers(ctx echo.Context) error {
 	var data models.ChatRemoveMemberDTO
 
 	buf := make([]byte, 1024)
 
 	num, _ := ctx.Request().Body.Read(buf)
 	err := json.Unmarshal(buf[:num], &data)
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "cant unmarshal")
 	}
 
-	err=h.Chat.RemoveMembers(context.Background(), token, data)
-
+	id, _ := ctx.Get("id").(int)
+	err = h.Chat.RemoveMembers(ctx.Request().Context(), id, data)
 	if err != nil {
 		if errors.Is(err, e.UserUnauthorized) {
 			return echo.NewHTTPError(http.StatusUnauthorized)

@@ -35,6 +35,7 @@ type Repository struct {
 func NewRepository(pool *pgxpool.Pool, logger logger.Logger) *Repository {
 	return &Repository{
 		Auth: NewAuthPostgres(pool, logger),
+		Chat: NewChatPostgres(logger, pool),
 		/*User:    NewUserRepository(),
 		Message: NewMessageRepository(),
 		Chat:    NewChatRepository(),*/

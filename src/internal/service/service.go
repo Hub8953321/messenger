@@ -21,9 +21,9 @@ type Message interface {
 }
 
 type Chat interface {
-	CreateChat(ctx context.Context, token string, dto models.ChatCreateDTO) (int, error)
-	AddMembers(ctx context.Context, token string, dto models.ChatAddMemberDTO) error
-	RemoveMembers(ctx context.Context, token string, dto models.ChatRemoveMemberDTO) error
+	CreateChat(ctx context.Context, id int, dto models.ChatCreateDTO) (int, error)
+	AddMembers(ctx context.Context, id int, dto models.ChatAddMemberDTO) error
+	RemoveMembers(ctx context.Context, id int, dto models.ChatRemoveMemberDTO) error
 }
 
 type Service struct {
@@ -33,10 +33,11 @@ type Service struct {
 	Chat
 }
 
-func NewService(logger logger.Logger, auth repository.Auth,
+func NewService(logger logger.Logger, repository *repository.Repository,
 	accessConverter *fst.EncodedConverter, refreshConverter *fst.EncodedConverter) *Service {
 	return &Service{
-		Auth: NewAuthService(logger, auth, accessConverter, refreshConverter),
+		Auth: NewAuthService(logger, repository.Auth, accessConverter, refreshConverter),
+		Chat: NewChatService(logger, repository.Chat, accessConverter, refreshConverter),
 		/*User:    NewUserService(),
 		Message: NewMessageService(),
 		Chat:    NewChatService(),*/

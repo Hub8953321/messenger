@@ -25,7 +25,6 @@ func NewAuthPostgres(pool *pgxpool.Pool, logger logger.Logger) *AuthPostgres {
 func (a *AuthPostgres) SignUp(ctx context.Context, dto models.UserSingUpDTO) (int, error) {
 	id := -1
 	err := a.QueryRow(ctx, "SELECT 1 FROM users WHERE login =  $1", dto.Login).Scan(&id)
-
 	if err != nil {
 		a.Logger.Error(err.Error())
 		return -1, err
@@ -62,14 +61,13 @@ func (a *AuthPostgres) Refresh(ctx context.Context, id int, password string) err
 	var buf int
 
 	err := a.QueryRow(ctx, "SELECT 1 FROM users WHERE id=$1 AND password=$2", id, password).Scan(&buf)
-
 	if err != nil {
 		a.Logger.Error(err.Error())
 		return err
 	}
 
 	if id != 1 {
-		return e.UserIsApcent
+		return e.UserIsAbsent
 	}
 
 	return nil

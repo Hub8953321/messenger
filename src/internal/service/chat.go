@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/Eugene-Usachev/fastbytes"
 	"github.com/Eugene-Usachev/fst"
 	e "messager/src/internal/errors"
 	"messager/src/internal/models"
 	"messager/src/internal/repository"
 	"messager/src/pkg/logger"
+	"slices"
 )
 
 type ChatService struct {
@@ -29,54 +29,24 @@ func NewChatService(logger logger.Logger, chat repository.Chat,
 	}
 }
 
-func (c *ChatService) CreateChat(ctx context.Context, token string, dto models.ChatCreateDTO) (int, error) {
-	buf, err := c.accessConvertor.ParseToken(token)
-
-	if err != nil {
-		return 0, e.UserUnauthorized
-	}
-
-	id := fastbytes.B2I(buf)
-
+func (c *ChatService) CreateChat(ctx context.Context, id int, dto models.ChatCreateDTO) (int, error) {
 	if len(dto.Members) < 2 {
-		return -1, e.ArrayTooShort
+		return -1, e.ListTooShort
 	}
 
-	var isUserInMembers bool
-	for _, member := range dto.Members {
-		if member == id {
-			isUserInMembers = true
-		}
-	}
-	if !isUserInMembers {
+	if !slices.Contains(dto.Members, id) {
 		return -1, e.AccessError
 	}
+
+	dto.Admin = id
 
 	return c.Chat.CreateChat(ctx, dto)
 }
 
-func (c *ChatService) AddMembers(ctx context.Context, token string, dto models.ChatAddMemberDTO) error {
-	buf, err := c.accessConvertor.ParseToken(token)
-
-	if err != nil {
-		return e.UserUnauthorized
-	}
-
-	id := fastbytes.B2I(buf)
-
+func (c *ChatService) AddMembers(ctx context.Context, id int, dto models.ChatAddMemberDTO) error {
 	return c.Chat.AddMembers(ctx, id, dto)
 }
 
-func (c *ChatService) RemoveMembers (ctx context.Context, token string, dto models.ChatRemoveMemberDTO) error{
-
-	buf, err := c.accessConvertor.ParseToken(token)
-
-	if err != nil {
-		return e.UserUnauthorized
-	}
-
-	id:= fastbytes.B2I(buf)
-
+func (c *ChatService) RemoveMembers(ctx context.Context, id int, dto models.ChatRemoveMemberDTO) error {
 	return c.Chat.RemoveMembers(ctx, id, dto)
-
 }

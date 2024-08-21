@@ -3,7 +3,7 @@ package models
 type ChatCreateDTO struct {
 	Name    string `json:"name" binding:"required"`
 	Members []int  `json:"members" binding:"required"`
-	Creator int    `json:"creater" binding:"required"`
+	Admin   int    `json:"admin"`
 }
 
 type ChatAddMemberDTO struct {

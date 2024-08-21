@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"github.com/labstack/echo/v4"
@@ -18,12 +17,11 @@ func (h *Handler) SingUp(ctx echo.Context) error {
 
 	num, _ := ctx.Request().Body.Read(buf)
 	err := json.Unmarshal(buf[:num], &dto)
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	//TODO
-	id, access, refresh, err := h.Auth.SignUp(context.Background(), dto)
+
+	id, access, refresh, err := h.Auth.SignUp(ctx.Request().Context(), dto)
 	if err != nil {
 		if errors.Is(err, e.LoginBusy) {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -39,12 +37,11 @@ func (h *Handler) SignIn(ctx echo.Context) error {
 
 	num, _ := ctx.Request().Body.Read(buf)
 	err := json.Unmarshal(buf[:num], &dto)
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	//TODO
-	id, access, refresh, err := h.Auth.SignIn(context.Background(), dto)
+
+	id, access, refresh, err := h.Auth.SignIn(ctx.Request().Context(), dto)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -61,10 +58,9 @@ func (h *Handler) Refresh(ctx echo.Context) error {
 
 	token := ctx.QueryParam("token")
 
-	access, refresh, err := h.Auth.Refresh(context.Background(), id, token)
-
+	access, refresh, err := h.Auth.Refresh(ctx.Request().Context(), id, token)
 	if err != nil {
-		if errors.Is(err, e.UserIsApcent) {
+		if errors.Is(err, e.UserIsAbsent) {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
